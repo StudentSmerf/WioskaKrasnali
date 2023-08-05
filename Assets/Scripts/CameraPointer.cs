@@ -1,20 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static CameraPointer.CameraPointerState;
 
 public class CameraPointer : MonoBehaviour
 {
     [SerializeField] private GameObject cameraGameObject;
     [SerializeField] private GameObject sphereGameObject;
+    [SerializeField] private GameObject MainBuildingOutline;
+    [SerializeField] private GameObject StorageBuildingOutline;
+    public GameObject sphere;
+    public GameObject buildingOutline;
+    
+
     public Vector3 originPoint;
-    [SerializeField] public GameObject sphere;
 
     private Vector3 direction;
     private Vector3 worldPosition;
     private Vector3 screenPosition;
     private Vector3 defaultPointerPosition = new Vector3(0, -20, 0);
+
+    public int selectedBuildingId;
+
+    public enum CameraPointerState
+    {
+        moveCharacters=0,
+        placeBuildings
+    }
+
+    public CameraPointerState state;
     void Start(){
         sphere = Instantiate(sphereGameObject, defaultPointerPosition, Quaternion.identity);
+        state = moveCharacters;
     }
 
     void Update()
@@ -25,23 +42,65 @@ public class CameraPointer : MonoBehaviour
         direction = worldPosition - cameraGameObject.transform.position;
         RaycastHit hit;
         if(Physics.Raycast(cameraGameObject.transform.position, direction, out hit)){
-            if(Input.GetButtonDown("Fire1")){
-                originPoint = hit.point;
-                sphere.transform.position = originPoint;
+            switch (state)
+            {
+                case moveCharacters:
+                    if(Input.GetButtonDown("Fire1")){
+                        originPoint = hit.point;
+                        sphere.transform.position = originPoint;
+                    }
+                    if(Input.GetButton("Fire1")){
+                        sphere.transform.localScale = new Vector3((originPoint - hit.point).magnitude, (originPoint - hit.point).magnitude, (originPoint - hit.point).magnitude);
+                    }
+                    if(Input.GetButtonUp("Fire1")){
+                        sphere.transform.localScale = new Vector3(1, 1, 1);
+                        sphere.transform.position = defaultPointerPosition;
+                    }
+                    if(Input.GetButtonDown("Fire2")){
+                        GameStateManager.instance.SetTargetPosition(hit.point);
+                    }
+                    break;
+                case placeBuildings:
+                    if(Input.GetButtonDown("Fire1")){
+                        originPoint = hit.point;
+                        Debug.Log(originPoint);
+                        GameStateManager.instance.CreateBuilding(originPoint, selectedBuildingId);
+                        Destroy(buildingOutline);
+                        state = moveCharacters;
+                    }
+                    if(hit.transform.tag == "Ground"){
+                        buildingOutline.transform.position = hit.point;
+                    }
+                    
+                    if(Input.GetButtonDown("Fire2")){
+                        state = moveCharacters;
+                        Destroy(buildingOutline);
+                    }
+                    break;
+                default:
+                    break;
             }
-            if(Input.GetButton("Fire1")){
-                sphere.transform.localScale = new Vector3((originPoint - hit.point).magnitude, (originPoint - hit.point).magnitude, (originPoint - hit.point).magnitude);
-            }
-            if(Input.GetButtonUp("Fire1")){
-                sphere.transform.localScale = new Vector3(1, 1, 1);
-                sphere.transform.position = defaultPointerPosition;
-            }
-            if(Input.GetButtonDown("Fire2")){
-                GameStateManager.instance.SetTargetPosition(hit.point);
-            }
+            
         }
 
         
         
+    }
+    public void EnterBuildingState(int Id){
+        selectedBuildingId = Id;
+        switch (Id)
+        {
+            case 0:
+                buildingOutline = Instantiate(MainBuildingOutline, defaultPointerPosition, Quaternion.identity);
+                break;
+            case 1:
+                buildingOutline = Instantiate(StorageBuildingOutline, defaultPointerPosition, Quaternion.identity);
+                break;
+            default:
+                break;
+        }
+        
+        
+        state = placeBuildings;
     }
 }

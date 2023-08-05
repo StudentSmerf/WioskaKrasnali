@@ -11,7 +11,6 @@ public class Dwarf : AbstractCharacter
     }
     public override void Move(float x, float z){
         if(characterGameObject.GetComponent<SelectCharacter>().CheckIfSelected()){
-            //cameraGameObject.transform.position = Vector3.MoveTowards(characterGameObject.transform.position, endPosition, movementSpeed * Time.deltaTime);
             characterGameObject.GetComponent<CharacterMovement>().MoveTowardsPoint(x, z, movementSpeed);
         }
     }
