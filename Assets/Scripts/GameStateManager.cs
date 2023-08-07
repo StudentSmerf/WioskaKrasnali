@@ -44,7 +44,7 @@ public class GameStateManager : MonoBehaviour
         {
             case 0:
                 if(mainBuildingNotCreated){
-                    GameObject newMainBuilding = Instantiate(mainBuilding, position, Quaternion.identity);
+                    GameObject newMainBuilding = Instantiate(mainBuilding, position, mainBuilding.transform.rotation);
                     MainBuilding MBClass = new MainBuilding(newMainBuilding);
                     buildingList.Add(MBClass);
                     mainBuildingNotCreated = false;
@@ -52,7 +52,7 @@ public class GameStateManager : MonoBehaviour
                 }
                 break;
             case 1:
-                GameObject newStorageBuilding = Instantiate(storageBuilding, position, Quaternion.identity);
+                GameObject newStorageBuilding = Instantiate(storageBuilding, position, storageBuilding.transform.rotation);
                 StorageBuilding StorageClass = new StorageBuilding(newStorageBuilding);
                 buildingList.Add(StorageClass);
                 break;
