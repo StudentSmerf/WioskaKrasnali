@@ -7,6 +7,7 @@ public class GameStateManager : MonoBehaviour
     public GameObject dwarf;
     public GameObject mainBuilding;
     public GameObject storageBuilding;
+    public GameObject pile;
     [SerializeField] private List<AbstractCharacter> characterList;
     [SerializeField] private List<AbstractBuilding> buildingList;
     public static GameStateManager instance;
@@ -24,6 +25,10 @@ public class GameStateManager : MonoBehaviour
             Dwarf dwarfClass = new Dwarf(newDwarf);
             characterList.Add(dwarfClass);
             newDwarf.name = "Dwarf " + i;
+        }
+        for (int i = 0; i < 5; i++){
+            GameObject pileGO = Instantiate(pile, GetPosition(), Quaternion.identity);
+            pileGO.name = "Pile " + i;
         }
     }
 

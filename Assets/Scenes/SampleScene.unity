@@ -803,6 +803,7 @@ MonoBehaviour:
   dwarf: {fileID: 1759126365492996884, guid: cf9b11d9af7345543815cb24bbedcb9f, type: 3}
   mainBuilding: {fileID: 4473536140455317197, guid: ebb0676c334368e49926c2c7afe25270, type: 3}
   storageBuilding: {fileID: 5557723743686898296, guid: 387efbe25078f914dbbaeff6f1e5b505, type: 3}
+  pile: {fileID: 3959301245201082465, guid: 5224bcdbced636b4793b39f8d9d087d1, type: 3}
 --- !u!4 &1103563757
 Transform:
   m_ObjectHideFlags: 0

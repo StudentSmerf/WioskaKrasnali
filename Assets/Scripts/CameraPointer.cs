@@ -22,20 +22,34 @@ public class CameraPointer : MonoBehaviour
 
     public int selectedBuildingId;
 
+    private int amountToTransfer;
+    private int itemId;
+
+    private IStorageable sender;
+    private IStorageable reciver;
+
     public enum CameraPointerState
     {
         moveCharacters=0,
-        placeBuildings
+        placeBuildings,
+        accesStorage
     }
 
     public CameraPointerState state;
     void Start(){
         sphere = Instantiate(sphereGameObject, defaultPointerPosition, Quaternion.identity);
         state = moveCharacters;
+        amountToTransfer = 1;
     }
 
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.LeftShift)){
+            state = accesStorage;
+        }
+        if(Input.GetKeyUp(KeyCode.LeftShift)){
+            state = moveCharacters;
+        }
         screenPosition = Input.mousePosition;
         screenPosition.z = Camera.main.nearClipPlane;
         worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
@@ -75,6 +89,32 @@ public class CameraPointer : MonoBehaviour
                     if(Input.GetButtonDown("Fire2")){
                         state = moveCharacters;
                         Destroy(buildingOutline);
+                    }
+                    break;
+                case accesStorage:
+                    
+                    if(hit.transform.gameObject.TryGetComponent(out IStorageable obj)){
+                        if(Input.GetButtonDown("Fire1")){
+                            sender = obj;
+                        }
+                        if(Input.GetButtonDown("Fire2")){
+                            reciver = obj;
+                        }
+                        if(Input.GetKeyDown(KeyCode.Alpha1) && sender != null && reciver != null){
+                            itemId = 0;
+                            Vector3 senderPos = new Vector3(sender.GetX(), 0f, sender.GetZ());
+                            Vector3 reciverPos = new Vector3(reciver.GetX(), 0f, reciver.GetZ());
+                            Vector3 distance = senderPos - reciverPos;
+                            if(distance.magnitude > 2f){
+                                //do nothing
+                                Debug.Log("Too far to reach!");
+                            }
+                            else{
+                                sender.DepositItem(reciver.DepositItem(sender.CollectItem(amountToTransfer, itemId), itemId), itemId); 
+                                Debug.Log(sender + " send " + amountToTransfer + " to " + reciver);
+                            }
+                            
+                        }
                     }
                     break;
                 default:
